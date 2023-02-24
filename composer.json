@@ -1,0 +1,20 @@
+{
+    "name": "kdv/big-register",
+    "description": "A few classes for connecting to the Dutch BIG-Register (health care professionals)",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Kdv\\BigRegisterPackage\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kasper de Vlaming",
+            "email": "kdv@sog.nl"
+        }
+    ],
+    "require": {
+        "econea/nusoap": "^0.9.13"
+    }
+}

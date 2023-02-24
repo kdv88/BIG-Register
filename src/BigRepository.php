@@ -1,7 +1,14 @@
 <?php
-require 'nusoap.php';
+// require 'nusoap.php';
 
-class BIGRepository
+namespace Kdv\BigRegisterPackage;
+
+use DateTime;
+use Kdv\BigRegisterPackage\BigRecord;
+use \nusoap_client;
+use \soapval;
+
+class BigRepository
 {
     protected $client;
     protected $namespace = 'http://services.cibg.nl/ExternalUser';
@@ -22,7 +29,7 @@ class BIGRepository
     {
         $params['WebSite'] = 'Ribiz';
         $client = $this->getClient();
-
+        
         $soapVals = array();
         foreach ($params as $key => $value) {
             $soapVals[] = new soapval($key, null, $value, $this->namespace);
@@ -34,14 +41,16 @@ class BIGRepository
             $this->namespace,
             'http://services.cibg.nl/ExternalUser/ListHcpApprox4'
         );
-
+        
+        //	return $result;
+        
         if (empty($result) || !isset($result['ListHcpApprox4'])) {
             return false;
         }
         
         return new BIGRecord($result['ListHcpApprox4']);
     }
-
+    
     public function fetchByRegistrationNumber($id)
     {
         return $this->fetchByParameters(array(
@@ -99,57 +108,5 @@ class BIGRepository
             }
         }
     }
-}
-
-class BIGRecord
-{
-    protected $data;
-
-    public function __construct($data)
-    {
-        $this->data = $data;
-    }
     
-    public function getData()
-    {
-        return $this->data;
-    }
-    
-    public function getFullName()
-    {
-        if (empty($this->data['Initial']) || empty($this->data['BirthSurname'])) {
-            return;
-        }
-    
-        return $this->data['Initial'].' '.$this->data['BirthSurname'];
-    }
-    
-    public function getRegistrationNumber()
-    {
-        $data = $this->data['ArticleRegistration']['ArticleRegistrationExtApp'];
-        
-        if( is_array( $data ) && count( $data ) > 0  ) { 
-            $return = [];
-            foreach( $data as $d ) {
-                $return[] = $d['ArticleRegistrationNumber'];
-            }
-            
-            return $return;
-        }
-        
-        
-        if (empty($this->data['ArticleRegistration']['ArticleRegistrationExtApp']['ArticleRegistrationNumber'])) {
-            return;
-        }
-        
-        return $this->data['ArticleRegistration']['ArticleRegistrationExtApp']['ArticleRegistrationNumber'];
-    }
-    
-    public function getArticleRegistration() {
-        if (empty($this->data['ArticleRegistration'])) {
-            return [];
-        }
-        
-        return $this->data['ArticleRegistration'];
-    }
 }
