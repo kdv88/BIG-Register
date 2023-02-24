@@ -1,10 +1,10 @@
 <?php
 // require 'nusoap.php';
 
-namespace Kdv\BigRegisterPackage;
+namespace Kdv\BigRegister;
 
 use DateTime;
-use Kdv\BigRegisterPackage\BigRecord;
+use Kdv\BigRegister\BigRecord;
 use \nusoap_client;
 use \soapval;
 

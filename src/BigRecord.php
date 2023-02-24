@@ -1,6 +1,6 @@
 <?php
 
-namespace Kdv\BigRegisterPackage;
+namespace Kdv\BigRegister;
 
 
 class BigRecord
