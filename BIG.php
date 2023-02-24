@@ -13,7 +13,7 @@ class BIGRepository
         }
         
         return $this->client = new nusoap_client(
-            'http://webservices.cibg.nl/Ribiz/Openbaar.asmx'
+            'https://webservices.cibg.nl/Ribiz/OpenbaarV4.asmx'
         );
     }
     
@@ -31,14 +31,14 @@ class BIGRepository
             'listHcpApproxRequest', 
             $soapVals,
             $this->namespace,
-            'http://services.cibg.nl/ExternalUser/ListHcpApprox'
+            'http://services.cibg.nl/ExternalUser/ListHcpApprox4'
         );
 
-        if (empty($result) || !isset($result['ListHcpApprox'])) {
-            return;
+        if (empty($result) || !isset($result['ListHcpApprox4'])) {
+            return false;
         }
         
-        return new BIGRecord($result['ListHcpApprox']);
+        return new BIGRecord($result['ListHcpApprox4']);
     }
 
     public function fetchByRegistrationNumber($id)
