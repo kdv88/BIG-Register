@@ -5,7 +5,8 @@ class BIGRepository
 {
     protected $client;
     protected $namespace = 'http://services.cibg.nl/ExternalUser';
-
+    private $professionalGroups = [];
+    
     protected function getClient()
     {
         if ($this->client) {
@@ -55,6 +56,49 @@ class BIGRepository
             'DateOfBirth'   => $birthdate->format('Y-m-d')
         ));
     }
+    
+    public function fetchByNameAndInitials( $name, $initials, $params = [] ) {
+        $params['Name'] = $name;
+        $params['Initials'] = $initials;
+        
+        return $this->fetchByParameters($params);
+    }
+    
+    public function fetchRaw( $params ) {
+        return $this->fetchByParameters( $params );
+    }
+    
+    public function fetchProfessionalGroups( $force = false ) {
+        if( !empty( $this->professionalGroups ) && !$force ) return $this->professionalGroups;
+        
+        $params['WebSite'] = 'Ribiz';
+        $client = $this->getClient();
+        
+        $soapVals = array();
+        foreach ($params as $key => $value) {
+            $soapVals[] = new soapval($key, null, $value, $this->namespace);
+        }
+        
+        $result = $client->call(
+            'GetRibizReferenceDataRequest', 
+            $soapVals,
+            $this->namespace,
+            'http://services.cibg.nl/ExternalUser/GetRibizReferenceData'
+        );
+        
+        return $result;
+    }
+    
+    public function getProfessionalGroup( $code ) {
+        $result = $this->fetchProfessionalGroups();
+        $professionalGroup = $result['ProfessionalGroups']['ProfessionalGroup'];
+
+        foreach( $professionalGroup as $group ) {
+            if( $group['Code'] == $code  ) {
+                return $group;
+            }
+        }
+    }
 }
 
 class BIGRecord
@@ -82,10 +126,30 @@ class BIGRecord
     
     public function getRegistrationNumber()
     {
+        $data = $this->data['ArticleRegistration']['ArticleRegistrationExtApp'];
+        
+        if( is_array( $data ) && count( $data ) > 0  ) { 
+            $return = [];
+            foreach( $data as $d ) {
+                $return[] = $d['ArticleRegistrationNumber'];
+            }
+            
+            return $return;
+        }
+        
+        
         if (empty($this->data['ArticleRegistration']['ArticleRegistrationExtApp']['ArticleRegistrationNumber'])) {
             return;
         }
         
         return $this->data['ArticleRegistration']['ArticleRegistrationExtApp']['ArticleRegistrationNumber'];
+    }
+    
+    public function getArticleRegistration() {
+        if (empty($this->data['ArticleRegistration'])) {
+            return [];
+        }
+        
+        return $this->data['ArticleRegistration'];
     }
 }
